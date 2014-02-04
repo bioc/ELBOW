@@ -1,0 +1,528 @@
+%\VignetteIndexEntry{Using ELBOW --- the definitive ELBOW tutorial}
+\documentclass{article}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage[utf8]{inputenc}
+\title{ELBOW -- Evaluating foLd change By the lOgit Way}
+\author{}
+\begin{document}
+\begin{titlepage}
+\begin{center}
+\Huge{\textcolor{red}{ELBOW} -- \textcolor{red}{E}\textcolor{blue}{valuating fo}\textcolor{red}{L}\textcolor{blue}{d change }\textcolor{red}{B}\textcolor{blue}{y the l}\textcolor{red}{O}\textcolor{blue}{git }\textcolor{red}{W}\textcolor{blue}{ay}}
+
+\bigskip
+
+\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{elbow_man.jpg}
+\end{center}
+\end{titlepage}
+
+\tableofcontents
+\maketitle
+
+\section{FOREWORD}
+This in depth tutorial about ELBOW is designed for those (especially biologists) who may need to review logit curves, logistic regression, or cluster analysis and their applications in determining biological significance in transcriptomics. If you are already familiar with these concepts, or you wish to start using ELBOW and you are already familiar with R and Bioconductor you may choose to go directly to ``Quick Usage'' file.
+
+
+\section{What is ``ELBOW''?}
+ELBOW is an improved fold test method for determining values that are biologically significant when using next generation transcriptomics such as microarray and RNA Seq. \ ELBOW is likely applicable to other large biological datasets. 
+
+
+\section{How is ``ELBOW'' better than Fold test?}
+Fold test is notorious for having high levels of false positives and false negatives. 
+
+The ``ELBOW'' cut off is determined by the variance of the dataset being examined rather than by an arbitrary cut off such as ``two fold up and down.'' This reduces false positives and false negatives. 
+
+Unlike simple fold testing, ``ELBOW'' can be successfully applied to datasets that are not symmetric about zero.
+
+Below are results, one from a microarray and a RNA seq with significance determined by a standard fold test compared to RT PCR and the other with significance determined by ELBOW. ELBOW performed much better with lower rates of false positives and false negatives and improved \ match to RT PCR results. 
+
+\begin{center}
+\includegraphics[width=0.7\textwidth,height=0.7\textheight,keepaspectratio]{qtpcr-vs-omic.jpg}
+\end{center}
+
+
+\section{How does ELBOW works?}
+Fold values are calculated for your dataset. The values are then ordered from lowest (most negative) to highest (most positive). 
+
+Probe order is plotted on the x axis. Fold values are plotted on the y axis. 
+
+\includegraphics[width=0.6\textwidth,height=0.6\textheight,keepaspectratio]{elbow_annotated.jpg}
+
+ELBOW generates a graphical representation of the data in the form of a ``logit'' curve. All values above and below the midpoints of the two ``elbows'' of the logit curve are considered biologically significant. 
+
+\includegraphics[width=0.6\textwidth,height=0.6\textheight,keepaspectratio]{elbows_circled.jpg}
+
+ELBOW method came out of our observations about cluster analysis. This example graphical cluster analysis shows that a model to explain a dataset will work well for the first four clusters (green) but because the data levels off, the model will not apply for later clusterings (red). Examining and choosing a point on a curve to divide data is a useful method for many types of analyses. We decided to apply cluster analysis to determining biological significance of transcriptomics.
+\bigskip
+
+\subsection{Mathematically...}
+
+\includegraphics[width=0.5\textwidth,height=0.5\textheight,keepaspectratio]{logit_standard.jpg}
+
+ELBOW method also derives from probability theory and statistics methods used for examining data that gives a yes/no result. In the case of the ELBOW method we could use the inverse of the fold value multiplied by the order of the probes (from lowest to highest fold values) on the x axis and set positive probes = 1 and negative value = 0. The resulting graph would look like this. By applying a logistic curve to the value we can determine a midpoint. The midpoint provides valuable information.
+\bigskip
+
+\includegraphics[width=0.8\textwidth,height=0.8\textheight,keepaspectratio]{logit_inverted.jpg}
+
+Plotting things like ``inverse of fold value x order of fold value'' is a bit confusing but we don't actually have to do this because the inverse of the logistic curve is the logit curve. We already found the logit curve directly by the ELBOW method. We can use established methods, like ``tolerance limits'' from engineering, that are known to apply to logit curves in order to better analyze our data.
+
+\subsection{Symmetry About Zero}
+
+One important limitation to standard logit methods, such as tolerance limits, is they depend on the dataset having a symmetric distribution about zero. 
+
+\includegraphics[width=0.7\textwidth,height=0.7\textheight,keepaspectratio]{symmetry_about_zero.jpg}
+
+Biological data from transcriptomics is often not symmetric about the midpoint limiting the usefulness of standard methods. 
+
+
+\subsection{First Derivative Method}
+The manual method for finding the cut off limits uses derivatives. A midpoint to the data is found. Data is divided in half at the midpoint to create two separate datasets. Beginning at the midpoint, the change in the value to the next point, (the derivative) is determined. These derivatives are plotted. Since the derivative is the same as the slope of the tangent to the line, a large change in derivative equals a steep slope. The cut off for the manual method is set (by experimentation) where the derivative jumps to 0.03.
+
+\includegraphics[width=0.4\textwidth,height=0.4\textheight,keepaspectratio]{biodata_nonsymmetry.jpg}
+
+The manual method works very well but is time consuming to calculate.
+We generalized the manual method using principals of pattern recognition for image analysis to automatically determine limits.
+
+As in the manual method, the data is first divided into two at the midpoint. The two data subsets are smoothed by fitting a cubic smoothing spline. The derivatives for the points on the smoothed curves are determined.
+
+\includegraphics[width=0.4\textwidth,height=0.4\textheight,keepaspectratio]{tail_density.jpg}
+
+NOTE: how the density of points on the tails of the curve is less than the density at the midpoint. 
+
+The mean derivative value of both the upper and the lower smoothed curves is calculated. Since most data points are not significant and fall on the flat central line, the mean derivative is approximately the same as the derivative for the midpoint on any dataset we tested.
+
+Further testing showed that the value 1.75 X mean value always corresponded to the midpoint of the curve even on datasets not symmetric about zero or having unequal tails.
+
+\includegraphics[width=0.8\textwidth,height=0.8\textheight,keepaspectratio]{175_mean.jpg}
+
+
+\subsection{ELBOW Works Best! (comparison on non-symmetrical data)}
+First derivative method also gives a good match for standard methods in datasets that are symmetric. 
+
+\includegraphics[width=0.7\textwidth,height=0.7\textheight,keepaspectratio]{elbow_on_nonsymmetric.jpg}
+
+First derivative method works even better than our original manual method. 
+
+Compare results from Dataset B, a dataset symmetric about zero except for higher values in the positive tail. Only first derivative method detected that subtle difference.
+
+
+\subsection{Error Limits for ELBOW}
+
+\includegraphics[width=0.7\textwidth,height=0.7\textheight,keepaspectratio]{replicates_table.jpg}
+
+\emph{All possible pairing of initial and final conditions. A1, A2, A3 (initial), B1,B2,B3 (final) replicates, ELBOW limits averaging all replicates 1.9, -1.8. Upper limit all replicates  1.9; Lower limit all replicates -1.8; Highest Upper Limit 2.1; Lowest Upper Limit 1.2; Lowest Lower Limit -2.3; Highest Lower Limit -1.2; Result Upper Limit 1.9 ( 2.1 to 1.2 ); Result Lower Limit -1.8 (-1.5 to -2.3)}
+
+\bigskip
+
+ELBOW calculates an upper and lower error bound on the ELBOW limits by taking all possible pairs of replicates in initial condition and final condition and finding the ELBOW limits for all these pairs. A range of limits are determined. The more variance in the replicates, the broader the range. 
+
+ELBOW measures the variance of the fold test results using subsets of replicates to determine upper and lower bounds error. These are provided in a text report. 
+
+\begin{center}
+\includegraphics[width=0.7\textwidth,height=0.7\textheight,keepaspectratio]{standard_elbow.jpg}
+\end{center}
+
+\subsection{Null Result for ELBOW}
+Null is calculated by taking all possible pairs of replicates in initial conditions and finding the fold value difference for all these pairs. The median value for each probe forms the null set. ELBOW also gives high and low values. 
+
+\includegraphics[width=0.8\textwidth,height=0.8\textheight,keepaspectratio]{replicate_probe_cross_table.jpg}
+
+(Note that if you start with only two replicates null = high = low and ELBOW will only report the null value.) 
+
+\includegraphics[width=0.7\textwidth,height=0.7\textheight,keepaspectratio]{null_graph.jpg}
+
+The null line graphically provides information on the quality of your initial condition replicate set and a visual comparison for exploring the magnitude of the change between initial and final conditions. 
+
+In addition to the null line there is an upper (green) and lower (purple) null line which is based on the highest and lowest values for the initial conditions. This gives information on the variance of the initial condition replicates.
+
+
+\subsection{P value for the ELBOW result}
+The entire basis of the ELBOW model is that the dataset creates a logit curve that can be translated back to a logistic curve with a binomial fit . Therefore ELBOW provides a test with a p value result to make sure that the dataset fits the model. 
+
+\includegraphics[width=0.8\textwidth,height=0.8\textheight,keepaspectratio]{logit_standard_full.jpg}
+
+(If the data does not fit, different preparation may be required. This will be explained further in the trouble shooting section.)
+
+ELBOW provides a p value which is the log chi squared p value of the fit to the ELBOW model. (2\textsuperscript{P value} should be at or near 1 because we expect it to fit.)  
+
+If the p value is not provided this means the data does not fit the logit model on which ELBOW is based and the results can not be used to determine biological significance.
+
+\bigskip
+
+\textbf{\emph{NOTE: The $\log\chi^2$ P-value displayed by our program is \underline{NOT} the level of significance for any one probe!}}
+
+
+\subsection{One final tip (before you begin using ELBOW)}
+Standard fold tests are presumed to give more false positive and false negatives that purely statistical methods. 
+
+Comparison of ELBOW results with Statistical Analyses of Microarray (SAM) for a six replicate microarray result where that data set was also symmetric about zero do show more positive values with ELBOW. ELBOW did not produce more false negatives on this test.
+
+If you have six replicates in both your initial and final conditions and the dataset is symmetric about zero, then a statistical method such as SAM should give better results than ELBOW.
+
+\includegraphics[width=0.7\textwidth,height=0.7\textheight,keepaspectratio]{method_comparison.jpg}
+
+We recommend using ELBOW as the first step to determining biological significance if you have less than six replicates in both initial and final conditions and/or your dataset is not symmetric about zero. You may also choose to add additional methods to refine ELBOW's results such as t testing. Consult with your statistician or bioinformatician for further information. 
+
+
+\section{Excel Pipeline}
+First, place your data in the correct column order.  From first to last column: the probe names should be in the first column, the initial replicates should come next, and the final replicates should come last (see figure).
+
+\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{prepare_columns.jpg}
+
+\bigskip
+
+Second, check that your data is normalized.  Data from programs like ``pliers'' usually arrives already ``normalized'', especially when the data is from a microarray. Normalized means the data has been smoothed by taking a log value (usually 2) for each value. If you are not sure ask the data provider.  
+
+\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{normalize_data.jpg}
+
+\bigskip
+
+Third, save your data in a .csv (comma separated values) format file.  Other formats may not work.  Be sure to give your file a meaningful filename; the filename will appear at the top of the final elbow output graph.
+
+\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{save_csv.jpg}
+
+\bigskip
+
+Finally, load your data into R and run your data through ELBOW:
+
+<<analyze_excel,fig=TRUE>>=
+    # load the ELBOW library
+    library("ELBOW")
+	
+    # Set the filename (change everything after the <- to ``csv_file'',
+    # where csv_file is the filename of your CSV data file)
+    filename <- system.file("extdata", "EcoliMutMA.csv", package = "ELBOW")
+	
+    # Read in your CSV file
+    csv_data <- read.csv(filename)
+
+    # set the number of initial and final condition replicates both to three
+    init_count  <- 3
+    final_count <- 3
+
+    # Parse the probes, intial conditions and final conditions
+    # out of the CSV file.  Please see: extract_working_sets
+    # for more information.
+    #
+    # init_count should be the number of columns associated with
+    #       the initial conditions of the experiment.
+    # final_count should be the number of columns associated with
+    #       the final conditions of the experiment.
+    working_sets <- extract_working_sets(csv_data, init_count, final_count)
+
+    probes <- working_sets[[1]]
+    initial_conditions <- working_sets[[2]]
+    final_conditions <- working_sets[[3]]
+
+    # Uncomment to output the plot to a PNG file (optional)
+    # png(file="output_plot.png")
+
+    # Analyze the elbow curve.
+    sig <- analyze_elbow(probes, initial_conditions, final_conditions)
+    
+    # uncomment to write the significant probes to 'signprobes.csv'
+    #write.table(sig,file="signprobes.csv",sep=",",row.names=FALSE)
+@
+
+Your plot will appear. You can also ask R to report the results. a csv file with the significant probes and their fold values. After you enter the command below and it will appear in your R folder. 
+
+\includegraphics[width=0.8\textwidth,height=0.8\textheight,keepaspectratio]{typical_elbow.jpg}
+
+
+\section{Limma Pipeline}
+The steps below, for setting up the Microarray data and loading it into R, were adapted from the tutorial:
+\url{http://bioinformatics.knowledgeblog.org/2011/06/20/analysing-microarray-data-in-bioconductor}
+
+First, load your Microarray data into R (in the below example, we will load an expression set from NCBI's GEO database).  Note, the data must be normalized (see the last line of the code block below).
+
+<<load_limmma>>=
+	####
+	# Uncomment the lines below to install the necessary libraries:
+	####
+	#source("http://www.bioconductor.org/biocLite.R")
+	#biocLite("GEOquery")
+	#biocLite("simpleaffy")
+	#biocLite("limma")
+	#biocLite("affyPLM")
+	#biocLite("RColorBrewer")
+	####
+	
+	# retrieve the data from GEO
+	library("GEOquery")
+	getGEOSuppFiles("GSE20986")
+	untar("GSE20986/GSE20986_RAW.tar", exdir="data")
+	cels <- list.files("data/", pattern = "[gz]")
+	sapply(paste("data", cels, sep="/"), gunzip)
+	
+	# reading in the CEL data into R (w/simpleaffy)
+	library("simpleaffy")
+	pheno_data <- data.frame(
+		c(    # Name
+			"GSM524662.CEL", "GSM524663.CEL", "GSM524664.CEL",
+			"GSM524665.CEL", "GSM524666.CEL", "GSM524667.CEL",
+			"GSM524668.CEL", "GSM524669.CEL", "GSM524670.CEL",
+			"GSM524671.CEL", "GSM524672.CEL", "GSM524673.CEL"),
+		c(    # FileName
+			"GSM524662.CEL", "GSM524663.CEL", "GSM524664.CEL",
+			"GSM524665.CEL", "GSM524666.CEL", "GSM524667.CEL",
+			"GSM524668.CEL", "GSM524669.CEL", "GSM524670.CEL",
+			"GSM524671.CEL", "GSM524672.CEL", "GSM524673.CEL"),
+		c(    # Target
+			"iris", "retina", "retina",
+			"iris", "retina", "iris",
+			"choroid", "choroid", "choroid",
+			"huvec", "huvec", "huvec")
+		)
+	colnames(pheno_data) <- c("Name", "FileName", "Target")
+	write.table(pheno_data, "data/phenodata.txt", row.names=FALSE, quote=FALSE)
+	celfiles <- read.affy(covdesc="phenodata.txt", path="data")
+	
+	# normalizing the data
+	celfiles.gcrma <- gcrma(celfiles)
+@
+
+Perform quality control checks:
+
+\itemize{
+	\item{Chip level QC:
+<<limma_chip_qc>>=
+	########
+	# quality control checks (chip-level)
+	########
+	# load colour libraries
+	library("RColorBrewer")
+	
+	# set colour palette
+	cols <- brewer.pal(8, "Set1")
+	
+	# plot a boxplot of unnormalised intensity values
+	boxplot(celfiles, col=cols)
+	
+	# plot a boxplot of normalised intensity values, affyPLM is required to interrogate celfiles.gcrma
+	library("affyPLM")
+	boxplot(celfiles.gcrma, col=cols)
+	
+	# the boxplots are somewhat skewed by the normalisation algorithm
+	# and it is often more informative to look at density plots
+	# Plot a density vs log intensity histogram for the unnormalised data
+	hist(celfiles, col=cols)
+	
+	# Plot a density vs log intensity histogram for the normalised data
+	hist(celfiles.gcrma, col=cols)
+	########
+@
+	}
+	\item{Probe level QC:
+<<limma_probe_qc>>=
+		########
+		# quality control checks (probe-level)
+		########
+		# Perform probe-level metric calculations on the CEL files:
+		celfiles.qc <- fitPLM(celfiles)
+		
+		# Create an image of GSM24662.CEL:
+		image(celfiles.qc, which=1, add.legend=TRUE)
+		
+		# Create an image of GSM524665.CEL
+		# There is a spatial artifact present
+		image(celfiles.qc, which=4, add.legend=TRUE)
+		
+		# affyPLM also provides more informative boxplots
+		# RLE (Relative Log Expression) plots should have
+		# values close to zero. GSM524665.CEL is an outlier
+		RLE(celfiles.qc, main="RLE")
+		
+		# We can also use NUSE (Normalised Unscaled Standard Errors).
+		# The median standard error should be 1 for most genes.
+		# GSM524665.CEL appears to be an outlier on this plot too
+		NUSE(celfiles.qc, main="NUSE")#'
+		########
+@
+	}
+	\item{Sample vs. sample QC:
+<<limma_sample_qc>>=
+	########
+	# quality control checks (sample vs. sample)
+	########
+	eset <- exprs(celfiles.gcrma)
+	distance <- dist(t(eset),method="maximum")
+	clusters <- hclust(distance)
+	plot(clusters)
+	########
+@
+	}
+}
+
+Next, filter the data.
+<<limma_data_filter>>=
+	########
+	# data filtering
+	########
+	celfiles.filtered <- nsFilter(celfiles.gcrma, require.entrez=FALSE, remove.dupEntrez=FALSE)
+	# What got removed and why?
+	celfiles.filtered$filter.log
+@
+
+Then, extract the differentially expressed probes.
+<<limma_extract_diffexp>>=
+	########
+	# Finding differentially expressed probesets
+	########
+	samples <- celfiles.gcrma$Target
+
+	# check the results of this
+	#samples
+
+	# convert into factors
+	samples <- as.factor(samples)
+
+	# check factors have been assigned
+	#samples
+
+	# set up the experimental design
+	design <- model.matrix(~0 + samples)
+	colnames(design) <- c("choroid", "huvec", "iris", "retina")
+
+	# inspect the experiment design
+	#design
+@
+
+And, feed the data into limma:
+
+<<feed_limma>>=
+	########
+	# feed the data into limma for analysis
+	########
+	library("limma")
+
+	# fit the linear model to the filtered expression set
+	fit <- lmFit(exprs(celfiles.filtered$eset), design)
+
+	# set up a contrast matrix to compare tissues v cell line
+	contrast.matrix <- makeContrasts(huvec_choroid = huvec - choroid, huvec_retina = huvec - retina, huvec_iris <- huvec - iris, levels=design)
+
+	# Now the contrast matrix is combined with the per-probeset linear model fit.
+	huvec_fits <- contrasts.fit(fit, contrast.matrix)
+	huvec_ebFit <- eBayes(huvec_fits)
+@
+
+Finally, run the dataset through the ELBOW method.
+<<elbow_limma>>=
+	# load the ELBOW library
+	library("ELBOW")
+
+	# find the ELBOW limits	
+	get_elbow_limma(huvec_ebFit)
+@
+
+
+\section{DESeq Pipeline}
+
+The steps below, for loading the RNA-seq data into R, were adapted from the tutorial:
+\url{http://cgrlucb.wikispaces.com/Spring+2012+DESeq+Tutorial}
+
+Load the RNA-seq bam file into R:
+<<load_deseq>>=
+	# load the ELBOW library
+	library("ELBOW")
+	
+	# install the DESeq libraries
+	#source("http://www.bioconductor.org/biocLite.R")
+	#biocLite("DESeq")
+
+	## download the table
+	library("DESeq")
+	
+	# the following bam file dataset was obtained from:
+	# http://cgrlucb.wikispaces.com/file/view/yeast_sample_data.txt
+	# it has been downloaded into this package for speed convenience.
+	filename <- system.file("extdata", "yeast_sample_data.txt", package = "ELBOW")
+	
+	count_table <- read.table(filename, header=TRUE, sep="\t", row.names=1)
+	expt_design <- data.frame(row.names = colnames(count_table), condition = c("WE","WE","M","M","M"))
+	conditions = expt_design$condition
+	rnadata <- newCountDataSet(count_table, conditions)
+	rnadata <- estimateSizeFactors(rnadata)
+	rnadata <- as(rnadata, "CountDataSet")
+	## rnadata <- estimateVarianceFunctions(rnadata)
+	rnadata <- estimateDispersions(rnadata)
+	
+	# this next step is essential, but it takes a long time...
+	results <- nbinomTest(rnadata, "M", "WE")
+@
+
+Then, run an elbow analysis on the data:
+<<get_elbow_deseq>>=
+	limits <- do_elbow_rnaseq(results)
+@
+
+Additionally, you can plot the data:
+<<plot_elbow_deseq,fig=TRUE>>=
+	# plot the results w/elbow
+	plot_dataset(results, "log2FoldChange", limits$up_limit, limits$low_limit)
+@
+
+
+\section{Troubleshooting}
+\subsection{``I don't see anything like an ELBOW!''}
+
+\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{no_elbow.jpg}
+
+This kind of result is typical when data has not been properly formatted. Check that you have probes in the first column, initial conditions in the middle set of columns and final conditions in the last set of columns. Also be certain your file has been saved in proper comma separated values (.csv) and you have entered the correct number of replicates when you ran the program. 
+
+
+\subsection{The final cuve is flatter than the curve of initial conditions}
+
+\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{flat_initial.jpg}
+
+This result simply means there is more variance in the initial conditions than the final conditions. However, it is within limits for the ELBOW test. You may see this in certain situations such as downward metabolism or reduced expression overall in the final conditions. Because ELBOW has provided a p value, the limits are still valid to determine biological significance. 
+
+
+\subsection{``The ELBOW curve is flatter that the curve of initial conditions and there is no p value.''}
+
+\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{initial_flat_no_pvalue.jpg}
+
+This result means there is high replicate variance in the initial conditions. It also means that the final replicate set does not meet the model conditions. The wide variance in upper and lower null lines also indicates a problem. The overall effect is that because of the variance in the initial  replicates, ELBOW will not work and the results are not useful. It is often possible to troubleshoot this type of dataset to find the cause.
+
+Try using R's density plot to plot the density of each replicate. 
+
+
+\subsection{Density plot}
+Try using R's density plot to plot the density of each replicate. 
+
+\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{density_plot_sample.jpg}
+
+Using ``head'' will yield the column names of the dataset:
+\begin{verbatim}
+> head(csv_data)
+\end{verbatim}
+
+Add each additional replicate using:
+
+\begin{verbatim}
+> plot(density(csv_data$y1))
+\end{verbatim}
+
+(where y1 is the name of your first column)
+
+\bigskip
+
+Add the rest of the replicates on the same plot using
+
+\begin{verbatim}
+> lines(density(csv_data$y2))
+> lines(density(csv_data$y3))
+\end{verbatim}
+
+Each line should approximately overlap. In this case, the replicates do not overlap but are the same shape. It may be possible to adjust data until the lines overlap and then apply ELBOW.
+
+\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{bad_density_plot.jpg}
+
+In this case, the density plot indicates that one replicate (red) is very different from the others. The others match well and overlap each other. 
+
+ELBOW may work after the one very different replicate is removed from the dataset.
+
+If you are unable to get your datasets to generate a p value you cannot use ELBOW and should consult with your data provider.
+
+\end{document}
