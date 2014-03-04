@@ -1,27 +1,28 @@
 Package: ELBOW
 Type: Package
 Title: ELBOW - Evaluating foLd change By the lOgit Way
-Version: 0.99.3
+Version: 0.99.4
 Date: 2014-01-30
-Author: Xiangli Zhang, Natalie Bjorklund, Graham Alvare, Tom Ryzdak, Richard
-    Sparling, Brian Fristensky
+Author: Xiangli Zhang, Natalie Bjorklund, Graham Alvare, Tom Ryzdak,
+        Richard Sparling, Brian Fristensky
 Maintainer: Graham Alvare <alvare@cc.umanitoba.ca>, Xiangli Zhang
         <zhangju@cc.umanitoba.ca>
-Description: Elbow an improved fold change test that uses cluster analysis and
-    pattern recognition to set cut off limits that are derived directly from
-    intrareplicate variance without assuming a normal distribution for as few
-    as 2 biological replicates. Elbow also provides the same consistency as
-    fold testing in cross platform analysis. Elbow has lower false positive and
-    false negative rates than standard fold testing when both are evaluated
-    using T testing and Statistical Analysis of Microarray using 12 replicates
-    (six replicates each for initial and final conditions). Elbow provides a
-    null value based on initial condition replicates and gives error bounds for
-    results to allow better evaluation of significance.
+Description: Elbow an improved fold change test that uses cluster
+        analysis and pattern recognition to set cut off limits that are
+        derived directly from intrareplicate variance without assuming
+        a normal distribution for as few as 2 biological replicates.
+        Elbow also provides the same consistency as fold testing in
+        cross platform analysis. Elbow has lower false positive and
+        false negative rates than standard fold testing when both are
+        evaluated using T testing and Statistical Analysis of
+        Microarray using 12 replicates (six replicates each for initial
+        and final conditions). Elbow provides a null value based on
+        initial condition replicates and gives error bounds for results
+        to allow better evaluation of significance.
 License: file LICENSE
 License_is_FOSS: yes
 License_restricts_use: no
 Suggests: DESeq, GEOquery, limma, simpleaffy, affyPLM, RColorBrewer
 Depends: R (>= 2.15.0)
-biocViews: Bioinformatics, AssayTechnologies, Microarray, RNAseq,
-        AssayDomains, HighThroughputSequencing, Sequencing, Software,
-        MultiChannel, OneChannel, TwoChannel, GeneExpression
+biocViews: Technology, Microarray, RNASeq, Sequencing, Sequencing,
+        Software, MultiChannel, OneChannel, TwoChannel, GeneExpression
