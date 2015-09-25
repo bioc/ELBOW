@@ -34,7 +34,7 @@ The corresponding author: Brian Fristensky \email{frist@cc.umanitoba.ca}
 		Richard Sparling, Brian Fristensky
 
 	Maintainers: Graham Alvare \email{alvare@cc.umanitoba.ca},
-		Xiangli Zhang \email{zhangju@cc.umanitoba.ca}
+		Xiangli Zhang \email{justinzhang.xl@gmail.com}
 }
 
 % ~ put references to the literature/web site here ~
