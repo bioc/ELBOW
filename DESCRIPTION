@@ -6,7 +6,7 @@ Date: 2014-01-30
 Author: Xiangli Zhang, Natalie Bjorklund, Graham Alvare, Tom Ryzdak,
         Richard Sparling, Brian Fristensky
 Maintainer: Graham Alvare <alvare@cc.umanitoba.ca>, Xiangli Zhang
-        <zhangju@cc.umanitoba.ca>
+        <justinzhang.xl@gmail.com>
 Description: Elbow an improved fold change test that uses cluster
         analysis and pattern recognition to set cut off limits that are
         derived directly from intrareplicate variance without assuming
