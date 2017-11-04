@@ -1,3 +1,8 @@
+importFrom("graphics", "abline", "lines", "plot", "text")
+importFrom("stats", "binomial", "glm", "median", "na.omit", "predict",
+           "smooth.spline")
+importFrom("utils", "head")
+
 export(analyze_elbow)
 export(do_elbow_rnaseq)
 export(do_elbow)
