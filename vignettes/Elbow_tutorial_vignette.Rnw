@@ -240,12 +240,13 @@ First, load your Microarray data into R (in the below example, we will load an e
 	####
 	# Uncomment the lines below to install the necessary libraries:
 	####
-	#source("http://www.bioconductor.org/biocLite.R")
-	#biocLite("GEOquery")
-	#biocLite("simpleaffy")
-	#biocLite("limma")
-	#biocLite("affyPLM")
-	#biocLite("RColorBrewer")
+	#if (!requireNamespace("BiocManager", quietly=TRUE))
+    	#install.packages("BiocManager")
+	#BiocManager::install("GEOquery")
+	#BiocManager::install("simpleaffy")
+	#BiocManager::install("limma")
+	#BiocManager::install("affyPLM")
+	#BiocManager::install("RColorBrewer")
 	####
 	
 	# retrieve the data from GEO
@@ -428,8 +429,9 @@ Load the RNA-seq bam file into R:
 	library("ELBOW")
 	
 	# install the DESeq libraries
-	#source("http://www.bioconductor.org/biocLite.R")
-	#biocLite("DESeq")
+	#if (!requireNamespace("BiocManager", quietly=TRUE))
+    	#install.packages("BiocManager")
+	#BiocManager::install("DESeq")
 
 	## download the table
 	library("DESeq")

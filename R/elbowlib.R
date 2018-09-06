@@ -1103,8 +1103,9 @@ get_elbow_limma <- function(marraylm, columns=NULL) {
 #'
 #' @examples
 #'		# install the DESeq libraries
-#'		#source("http://www.bioconductor.org/biocLite.R")
-#'		#biocLite("DESeq")
+#'		#if (!requireNamespace("BiocManager", quietly=TRUE))
+    #'		#install.packages("BiocManager")
+#'		#BiocManager::install("DESeq")
 #'
 #'		## download the table
 #'		library("DESeq")
@@ -1170,8 +1171,9 @@ do_elbow_rnaseq <- function (rnaSeq) {
 #'
 #' @examples
 #'		# install the DESeq libraries
-#'		#source("http://www.bioconductor.org/biocLite.R")
-#'		#biocLite("DESeq")
+#'		#if (!requireNamespace("BiocManager", quietly=TRUE))
+    #'		#install.packages("BiocManager")
+#'		#BiocManager::install("DESeq")
 #'
 #'		## download the table
 #'		library("DESeq")
